@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// --- Énumérations pour la sécurité (RBAC)
+enum Role {
+  SUPERADMIN
+  DIRECTEUR
+  GERANT
+  VENDEUR
+  MAGASINIER
+}
+
+// --- Modèle Locataire (Commerce)
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  domain    String?  @unique // Pour la validation du nom de domaine
+  createdAt DateTime @default(now())
+
+  // Relations (Suppression en cascade si le commerce est supprimé)
+  users    User[]
+  products Product[]
+  sales    Sale[]
+}
+
+// --- Utilisateurs et Rôles ---
+model User {
+  id               String  @id @default(cuid())
+  email            String  @unique
+  name             String?
+  password         String
+  role             Role    @default(VENDEUR)
+  twoFactorEnabled Boolean @default(false) // Pour la sécurité 2FA
+  twoFactorSecret  String?
+
+  createdAt DateTime @default(now())
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  sales Sale[] // Ventes effectuées par cet utilisateur
+}
+
+// --- Gestion des Produits et Stocks
+model Product {
+  id    String @id @default(cuid())
+  name  String
+  price Float
+  stock Int    @default(0)
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  saleItems SaleItem[]
+}
+
+// --- Transactions de Vente
+model Sale {
+  id          String   @id @default(cuid())
+  totalAmount Float
+  createdAt   DateTime @default(now())
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  items SaleItem[]
+}
+
+model SaleItem {
+  id       String @id @default(cuid())
+  quantity Int
+  price    Float // Prix au moment de la vente
+
+  saleId String
+  sale   Sale   @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}

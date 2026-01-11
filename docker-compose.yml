@@ -1,0 +1,39 @@
+services:
+  # --- BASE DE DONNÉES ---
+  db:
+    image: postgres:17-alpine
+    container_name: pos_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 19082005
+      POSTGRES_DB: dealio
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # --- CACHE & LIMITATION DE DÉBIT (Redis) ---
+  redis:
+    image: redis:alpine
+    container_name: pos_redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  # --- APPLICATION NEXT.JS ---
+  app:
+    build: .
+    container_name: pos_app
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:mypassword@db:5432/saas_pos
+      - REDIS_URL=redis://redis:6379
+      - NEXTAUTH_SECRET=votre_secret_tres_long
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  postgres_data:
