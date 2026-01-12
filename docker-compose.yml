@@ -1,39 +1,34 @@
+version: '3.8'
+
 services:
-  # --- BASE DE DONNÉES ---
-  db:
-    image: postgres:17-alpine
-    container_name: pos_db
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 19082005
-      POSTGRES_DB: dealio
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-  # --- CACHE & LIMITATION DE DÉBIT (Redis) ---
-  redis:
-    image: redis:alpine
-    container_name: pos_redis
-    restart: always
-    ports:
-      - "6379:6379"
-
-  # --- APPLICATION NEXT.JS ---
   app:
-    build: .
-    container_name: pos_app
+    build:
+      context: .  # Le répertoire contenant le Dockerfile
+      dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "3000:3000"  # Mappe le port 3000 de l'hôte au conteneur
     environment:
-      - DATABASE_URL=postgresql://postgres:mypassword@db:5432/saas_pos
-      - REDIS_URL=redis://redis:6379
-      - NEXTAUTH_SECRET=votre_secret_tres_long
+      - NODE_ENV=production  # Mode production
+      - DATABASE_URL=postgresql://postgres:19082005@db:5432/dealio  # URL de connexion Prisma
+      # Ajoutez d'autres variables pour NextAuth (ex. : NEXTAUTH_SECRET, NEXTAUTH_URL)
+      - AUTH_SECRET=your_nextauth_secret_here
     depends_on:
-      - db
-      - redis
+      - db  # L'app dépend de la DB
+    volumes:
+      - .:/app  # Monte le code source pour hot-reload si en dev (optionnel pour prod)
+    command: ["npm", "start"]  # Ou override si besoin
+
+  db:
+    image: postgres:16  # Image officielle Postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=19082005  # Changez ce mot de passe !
+      - POSTGRES_DB=dealio  # Nom de votre DB
+    ports:
+      - "5432:5432"  # Pour accéder à la DB depuis l'hôte si besoin
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persistance des données
 
 volumes:
-  postgres_data:
+  postgres_data:  # Volume nommé pour persister la DB

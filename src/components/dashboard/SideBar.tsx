@@ -42,18 +42,18 @@ const menuByRole = {
   DIRECTEUR: [
     { href: "/dashboard", icon: LayoutDashboard, label: "Tableau de bord" },
     { href: "/dashboard/team", icon: Users, label: "Équipe" },
-    { href: "/dashboard/sales", icon: ShoppingCart, label: "Ventes" },
+    { href: "/dashboard/pos", icon: ShoppingCart, label: "Ventes" },
     { href: "/dashboard/products", icon: Package, label: "Stocks" },
-    { href: "/dashboard/reports", icon: BarChart3, label: "Rapports" },
+    { href: "/dashboard/sales", icon: BarChart3, label: "Rapports" },
     { href: "/dashboard/security", icon: Shield, label: "Sécurité" },
     { href: "/dashboard/settings", icon: Settings, label: "Paramètres" },
   ],
   GERANT: [
     { href: "/dashboard", icon: LayoutDashboard, label: "Tableau de bord" },
     { href: "/dashboard/team", icon: Users, label: "Équipe" },
-    { href: "/dashboard/sales", icon: ShoppingCart, label: "Ventes" },
+    { href: "/dashboard/pos", icon: ShoppingCart, label: "Ventes" },
     { href: "/dashboard/products", icon: Package, label: "Stocks" },
-    { href: "/dashboard/reports", icon: BarChart3, label: "Rapports" },
+    { href: "/dashboard/sales", icon: BarChart3, label: "Rapports" },
   ],
   VENDEUR: [
     { href: "/dashboard", icon: LayoutDashboard, label: "Tableau de bord" },
@@ -63,7 +63,7 @@ const menuByRole = {
   MAGASINIER: [
     { href: "/dashboard", icon: LayoutDashboard, label: "Tableau de bord" },
     { href: "/dashboard/products", icon: Package, label: "Stocks" },
-    { href: "/dashboard/reports", icon: BarChart3, label: "Rapports" },
+    { href: "/dashboard/sales", icon: BarChart3, label: "Rapports" },
   ],
 };
 

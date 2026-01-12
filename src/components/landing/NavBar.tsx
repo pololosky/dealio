@@ -42,10 +42,10 @@ const NavBar = () => {
   };
 
   const links = [
+    { name: "A propos", href: "#presentation" },
     { name: "Fonctionnalités", href: "#fonctionnalite" },
-    { name: "Tarifs", href: "#tar" },
+    { name: "Tarifs", href: "#tarif" },
     { name: "Documentation", href: "#doc" },
-    { name: "Contact", href: "#cont" },
   ];
 
   const renderLinks = () => {

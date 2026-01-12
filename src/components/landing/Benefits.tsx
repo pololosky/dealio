@@ -66,7 +66,7 @@ const Benefits = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Tout ce dont vous avez besoin
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-gray-400">
             Une suite complète d'outils pour gérer votre activité commerciale de
             A à Z.
           </p>

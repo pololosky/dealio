@@ -1,12 +1,14 @@
+
 // src/auth.ts
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { prisma } from "../lib/prisma";
+import { prisma } from "../lib/prisma"; // ajuste le chemin
 import bcrypt from "bcryptjs";
+import type { Adapter } from "@auth/core/adapters"; // ← Import clé pour le cast
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma) as any,
 
   providers: [
     CredentialsProvider({
@@ -35,11 +37,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return {
             id: user.id,
             email: user.email,
+            name: user.name,
             role: user.role,
             tenantId: user.tenantId,
+            twoFactorEnabled: user.twoFactorEnabled,
           };
         } catch (err) {
-          console.error("Authorize error:", err);
+          console.error("Erreur authorize :", err);
           return null;
         }
       },
@@ -48,6 +52,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 jours
   },
 
   callbacks: {
@@ -56,31 +61,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.id = user.id;
         token.role = user.role;
         token.tenantId = user.tenantId;
+        token.twoFactorEnabled = user.twoFactorEnabled;
+        token.twoFactorVerified = false; // reset à chaque login
       }
       return token;
     },
 
     async session({ session, token }) {
-      if (token?.id && session.user) {
+      if (token && session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
         session.user.tenantId = token.tenantId as string;
+        session.user.twoFactorEnabled = token.twoFactorEnabled as boolean;
+        session.user.twoFactorVerified = token.twoFactorVerified as boolean;
       }
       return session;
     },
 
-    // IMPORTANT : Empêche la redirection automatique dans les routes /api/*
     authorized({ request, auth }) {
       const pathname = request?.nextUrl?.pathname;
-      if (pathname?.startsWith("/api/")) {
-        return true; // on laisse passer même sans session → on gère manuellement
-      }
+      if (pathname?.startsWith("/api/")) return true;
       return !!auth?.user;
     },
   },
 
   pages: {
     signIn: "/login",
+    error: "/login?error=Erreur d'authentification",
   },
 
   secret: process.env.AUTH_SECRET!,

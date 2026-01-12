@@ -5,7 +5,7 @@ import React from "react";
 const Presentation = async () => {
   const session = await auth();
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden" id="#presentation">
       <div className="relative z-10 container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center animate-fade-in">
           {/* Badge */}

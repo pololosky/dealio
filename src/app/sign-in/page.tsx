@@ -5,45 +5,25 @@ import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: { error?: string };
-}) {
-  const error = searchParams.error;
-
-  // Pour renvoyer si on est connecté
+export default async function LoginPage() {
+  // Redirection si déjà connecté
   const session = await auth();
-  if (session) {
-    redirect("/dashboard");
-  }
+  if (session) redirect("/dashboard");
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-base-200 px-4">
       <div className="card bg-base-100 shadow-xl max-w-md w-full">
         <div className="card-body p-8">
-          <h2 className="card-title text-3xl font-bold text-center mb-2">
+          <h2 className="card-title text-3xl font-bold justify-center mb-2">
             Connexion
           </h2>
           <p className="text-center text-base-content/70 mb-6">
             Connectez-vous à votre compte Dealio
           </p>
 
-          {/* Affichage du message d'erreur */}
-          {error && (
-            <div className="alert alert-error shadow-lg mb-6">
-              <span>
-                {error === "CredentialsSignin"
-                  ? "Email ou mot de passe incorrect"
-                  : "Une erreur est survenue lors de la connexion"}
-              </span>
-            </div>
-          )}
-
           <form
             action={async (formData) => {
               "use server";
-
               try {
                 await signIn("credentials", {
                   email: formData.get("email"),
@@ -51,40 +31,30 @@ export default async function LoginPage({
                   redirectTo: "/dashboard",
                 });
               } catch (error) {
-                // IMPORTANT : NextAuth lance une redirection en cas de succès
-                // Il faut la laisser passer !
-                if (isRedirectError(error)) {
-                  throw error;
-                }
+                if (isRedirectError(error)) throw error;
 
                 if (error instanceof AuthError) {
-                  // Cas classique : mauvais identifiants
-                  if (error.type === "CredentialsSignin") {
-                    redirect("/login?error=CredentialsSignin");
-                  }
+                  // Redirection vers /login/CredentialsSignin par exemple
+                  return redirect(`/login/${error.type}`);
                 }
-                
-                // Autres erreurs inattendues
-                console.error("Erreur de connexion:", error);
-                redirect("/login?error=unknown");
+                // Redirection vers /login/unknown
+                return redirect("/login/unknown");
               }
             }}
             className="space-y-5"
           >
-            <div className="form-control">
+            <div className="form-control flex flex-col">
               <label className="label">
                 <span className="label-text">Email</span>
               </label>
               <input
                 name="email"
                 type="email"
-                placeholder="exemple@dealio.com"
                 className="input input-bordered w-full"
+                placeholder="vous@exemple.com"
                 required
-                autoComplete="email"
               />
             </div>
-
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Mot de passe</span>
@@ -92,27 +62,21 @@ export default async function LoginPage({
               <input
                 name="password"
                 type="password"
-                placeholder="••••••••"
                 className="input input-bordered w-full"
+                placeholder="••••••••"
                 required
-                autoComplete="current-password"
               />
             </div>
-
             <button type="submit" className="btn btn-primary w-full">
               Se connecter
             </button>
           </form>
 
           <div className="divider my-6">OU</div>
-
           <div className="text-center">
-            <p className="text-base-content/70">
-              Pas de compte ?{" "}
-              <Link href="/signup" className="link link-primary">
-                Créer un compte
-              </Link>
-            </p>
+            <Link href="/sign-up" className="link link-primary">
+              Créer un compte
+            </Link>
           </div>
         </div>
       </div>

@@ -22,7 +22,8 @@ export default async function SignUpPage({
             Créer votre commerce
           </h2>
           <p className="text-center text-base-content/70 mb-6">
-            Inscrivez-vous en tant que Directeur et créez votre espace commercial
+            Inscrivez-vous en tant que Directeur et créez votre espace
+            commercial
           </p>
 
           {message && (
@@ -43,8 +44,15 @@ export default async function SignUpPage({
               const emailRaw = formData.get("email")?.toString().trim();
               const password = formData.get("password")?.toString();
               const name = formData.get("name")?.toString().trim();
-              const commerceName = formData.get("commerceName")?.toString().trim();
-              const commerceDomain = formData.get("commerceDomain")?.toString().trim().toLowerCase();
+              const commerceName = formData
+                .get("commerceName")
+                ?.toString()
+                .trim();
+              const commerceDomain = formData
+                .get("commerceDomain")
+                ?.toString()
+                .trim()
+                .toLowerCase();
 
               // Normalisation de l'email (minuscules)
               const email = emailRaw?.toLowerCase();
@@ -52,20 +60,29 @@ export default async function SignUpPage({
               // Validations
               if (!email || !password || !name || !commerceName) {
                 redirect(
-                  "/signup?error=" + encodeURIComponent("Tous les champs obligatoires doivent être remplis")
+                  "/signup?error=" +
+                    encodeURIComponent(
+                      "Tous les champs obligatoires doivent être remplis"
+                    )
                 );
               }
 
               if (password.length < 8) {
                 redirect(
-                  "/signup?error=" + encodeURIComponent("Le mot de passe doit contenir au moins 8 caractères")
+                  "/signup?error=" +
+                    encodeURIComponent(
+                      "Le mot de passe doit contenir au moins 8 caractères"
+                    )
                 );
               }
 
               // Validation du domaine (slug format)
               if (commerceDomain && !/^[a-z0-9-]+$/.test(commerceDomain)) {
                 redirect(
-                  "/signup?error=" + encodeURIComponent("Le domaine ne peut contenir que des lettres minuscules, chiffres et tirets")
+                  "/signup?error=" +
+                    encodeURIComponent(
+                      "Le domaine ne peut contenir que des lettres minuscules, chiffres et tirets"
+                    )
                 );
               }
 
@@ -81,7 +98,10 @@ export default async function SignUpPage({
                 });
 
                 if (existingUser) {
-                  redirect("/signup?error=" + encodeURIComponent("Cet email est déjà utilisé"));
+                  redirect(
+                    "/signup?error=" +
+                      encodeURIComponent("Cet email est déjà utilisé")
+                  );
                 }
 
                 // Vérification de l'unicité du nom de commerce
@@ -96,10 +116,18 @@ export default async function SignUpPage({
 
                 if (existingTenant) {
                   if (existingTenant.name === commerceName) {
-                    redirect("/signup?error=" + encodeURIComponent("Ce nom de commerce est déjà utilisé"));
+                    redirect(
+                      "/signup?error=" +
+                        encodeURIComponent(
+                          "Ce nom de commerce est déjà utilisé"
+                        )
+                    );
                   }
                   if (existingTenant.domain === commerceDomain) {
-                    redirect("/signup?error=" + encodeURIComponent("Ce domaine est déjà pris"));
+                    redirect(
+                      "/signup?error=" +
+                        encodeURIComponent("Ce domaine est déjà pris")
+                    );
                   }
                 }
 
@@ -131,12 +159,19 @@ export default async function SignUpPage({
                   if (isRedirectError(signInError)) {
                     throw signInError;
                   }
-                  
-                  // Si la connexion échoue, rediriger vers login
-                  console.error("Erreur lors de la connexion automatique:", signInError);
-                  redirect("/login?message=" + encodeURIComponent("Compte créé avec succès ! Veuillez vous connecter."));
-                }
 
+                  // Si la connexion échoue, rediriger vers login
+                  console.error(
+                    "Erreur lors de la connexion automatique:",
+                    signInError
+                  );
+                  redirect(
+                    "/login?message=" +
+                      encodeURIComponent(
+                        "Compte créé avec succès ! Veuillez vous connecter."
+                      )
+                  );
+                }
               } catch (err: any) {
                 // IMPORTANT : Laisser passer les redirections de succès
                 if (isRedirectError(err)) {
@@ -177,7 +212,9 @@ export default async function SignUpPage({
             {/* Informations personnelles */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Votre nom complet *</span>
+                <span className="label-text font-semibold">
+                  Votre nom complet *
+                </span>
               </label>
               <input
                 name="name"
@@ -190,7 +227,9 @@ export default async function SignUpPage({
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Email professionnel *</span>
+                <span className="label-text font-semibold">
+                  Email professionnel *
+                </span>
               </label>
               <input
                 name="email"
@@ -224,7 +263,9 @@ export default async function SignUpPage({
             {/* Informations du commerce */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Nom de votre commerce *</span>
+                <span className="label-text font-semibold">
+                  Nom de votre commerce *
+                </span>
               </label>
               <input
                 name="commerceName"
@@ -242,7 +283,9 @@ export default async function SignUpPage({
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Domaine personnalisé (optionnel)</span>
+                <span className="label-text font-semibold">
+                  Domaine personnalisé (optionnel)
+                </span>
               </label>
               <div className="join w-full">
                 <input
@@ -263,12 +306,23 @@ export default async function SignUpPage({
 
             {/* Information sur le rôle */}
             <div className="alert alert-info">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                className="stroke-current shrink-0 w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
               </svg>
               <span className="text-sm">
-                Vous serez enregistré en tant que <strong>Directeur</strong>. 
-                Vous pourrez ensuite inviter votre équipe (gérants, vendeurs, magasiniers).
+                Vous serez enregistré en tant que <strong>Directeur</strong>.
+                Vous pourrez ensuite inviter votre équipe (gérants, vendeurs,
+                magasiniers).
               </span>
             </div>
 

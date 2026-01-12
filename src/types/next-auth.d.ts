@@ -1,37 +1,34 @@
-// types/next-auth.d.ts
-
 import { DefaultSession, DefaultUser } from "next-auth";
-import type { AdapterUser as BaseAdapterUser } from "@auth/core/adapters";
+import { DefaultJWT } from "next-auth/jwt";
+import { Role } from "@prisma/client"; // ajuste le chemin si besoin
 
-// On étend le AdapterUser de base
-declare module "@auth/core/adapters" {
-  interface AdapterUser extends BaseAdapterUser {
-    role: string;
-    tenantId: string;
-  }
-}
-// On étend les types "classiques" de next-auth
+// Extension pour le modèle User (Prisma + Credentials)
 declare module "next-auth" {
   interface User extends DefaultUser {
     id: string;
-    role: string;
+    role: Role;
     tenantId: string;
+    twoFactorEnabled: boolean;
   }
 
   interface Session {
     user: {
       id: string;
-      role: string;
+      role: Role;
       tenantId: string;
+      twoFactorEnabled: boolean;
+      twoFactorVerified?: boolean; // présent seulement après vérif 2FA
     } & DefaultSession["user"];
   }
 }
 
-// JWT
+// Extension JWT (important pour strategy: "jwt")
 declare module "next-auth/jwt" {
-  interface JWT {
+  interface JWT extends DefaultJWT {
     id: string;
-    role: string;
+    role: Role;
     tenantId: string;
+    twoFactorEnabled: boolean;
+    twoFactorVerified?: boolean;
   }
 }
